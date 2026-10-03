@@ -3592,66 +3592,67 @@ static void AffineToTransform(Image *image,AffineMatrix *affine)
 static char *EscapeSVGAttributeValue(const char *string)
 {
   char
-    *destination;
+    *destination,
+    *q;
 
   const unsigned char
     *p;
 
   size_t
-    length;
+    extent;
 
   /*
     XML encode text written into SVG attribute/style value contexts.
   */
   if (string == (const char *) NULL)
     return(AcquireString(""));
-  length=strlen(string);
-  destination=(char *) AcquireQuantumMemory(6UL*length+1UL,
-    sizeof(*destination));
+  extent=6UL*strlen(string)+1UL;
+  destination=(char *) AcquireQuantumMemory(extent,sizeof(*destination));
   if (destination == (char *) NULL)
     return(AcquireString(""));
-  *destination='\0';
+  q=destination;
   for (p=(const unsigned char *) string; *p != '\0'; p++)
   {
     switch (*p)
     {
       case '&':
       {
-        (void) ConcatenateMagickString(destination,"&amp;",6UL*length+1UL);
+        q+=(ptrdiff_t) CopyMagickString(q,"&amp;",
+          extent-(size_t) (q-destination));
         break;
       }
       case '<':
       {
-        (void) ConcatenateMagickString(destination,"&lt;",6UL*length+1UL);
+        q+=(ptrdiff_t) CopyMagickString(q,"&lt;",
+          extent-(size_t) (q-destination));
         break;
       }
       case '>':
       {
-        (void) ConcatenateMagickString(destination,"&gt;",6UL*length+1UL);
+        q+=(ptrdiff_t) CopyMagickString(q,"&gt;",
+          extent-(size_t) (q-destination));
         break;
       }
       case '"':
       {
-        (void) ConcatenateMagickString(destination,"&quot;",6UL*length+1UL);
+        q+=(ptrdiff_t) CopyMagickString(q,"&quot;",
+          extent-(size_t) (q-destination));
         break;
       }
       case '\'':
       {
-        (void) ConcatenateMagickString(destination,"&apos;",6UL*length+1UL);
+        q+=(ptrdiff_t) CopyMagickString(q,"&apos;",
+          extent-(size_t) (q-destination));
         break;
       }
       default:
       {
-        char
-          c[2];
-
-        c[0]=(char) *p;
-        c[1]='\0';
-        (void) ConcatenateMagickString(destination,c,6UL*length+1UL);
+        *q++=(char) (*p);
         break;
       }
     }
   }
+  *q='\0';
   return(destination);
 }
 
